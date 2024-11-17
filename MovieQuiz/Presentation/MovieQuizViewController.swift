@@ -19,7 +19,7 @@ final class MovieQuizViewController: UIViewController {
 	// переменная с индексом текущего вопроса
 	private var currentQuestionIndex = 0 {
 		didSet {
-			var delay = currentQuestionIndex == 0 ? 0 : 1.0
+			let delay = currentQuestionIndex == 0 ? 0 : 1.0
 			
 			DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self, currentQuestionIndex] in
 				self?.yesButton.isEnabled = true
