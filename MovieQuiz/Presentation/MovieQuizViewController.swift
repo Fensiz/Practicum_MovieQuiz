@@ -84,7 +84,7 @@ final class MovieQuizViewController: UIViewController {
 	// MARK: - IBActions
 	@IBAction private func anyButtonTouchUp(_ sender: UIButton) {
 		let currentQuestion = questions[currentQuestionIndex]
-		let givenAnswer = sender.titleLabel?.text == "Да"
+		let givenAnswer = sender.accessibilityIdentifier == "yesButton"
 		let isCorrect = givenAnswer == currentQuestion.correctAnswer
 		if isCorrect {
 			correctAnswers += 1
@@ -131,9 +131,9 @@ final class MovieQuizViewController: UIViewController {
 			message: result.text,
 			preferredStyle: .alert)
 		
-		let action = UIAlertAction(title: result.buttonText, style: .default) { _ in
-			self.currentQuestionIndex = 0
-			self.correctAnswers = 0
+		let action = UIAlertAction(title: result.buttonText, style: .default) { [weak self] _ in
+			self?.currentQuestionIndex = 0
+			self?.correctAnswers = 0
 		}
 		
 		alert.addAction(action)
