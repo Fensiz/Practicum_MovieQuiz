@@ -30,50 +30,15 @@ final class MovieQuizViewController: UIViewController {
 	}
 	// переменная со счётчиком правильных ответов
 	private var correctAnswers = 0
-	// массив вопросов
-	private let questions: [QuizQuestion] = [
-		QuizQuestion(
-			image: "The Godfather",
-			text: "Рейтинг этого фильма больше чем 6?",
-			correctAnswer: true),
-		QuizQuestion(
-			image: "The Dark Knight",
-			text: "Рейтинг этого фильма больше чем 6?",
-			correctAnswer: true),
-		QuizQuestion(
-			image: "Kill Bill",
-			text: "Рейтинг этого фильма больше чем 6?",
-			correctAnswer: true),
-		QuizQuestion(
-			image: "The Avengers",
-			text: "Рейтинг этого фильма больше чем 6?",
-			correctAnswer: true),
-		QuizQuestion(
-			image: "Deadpool",
-			text: "Рейтинг этого фильма больше чем 6?",
-			correctAnswer: true),
-		QuizQuestion(
-			image: "The Green Knight",
-			text: "Рейтинг этого фильма больше чем 6?",
-			correctAnswer: true),
-		QuizQuestion(
-			image: "Old",
-			text: "Рейтинг этого фильма больше чем 6?",
-			correctAnswer: false),
-		QuizQuestion(
-			image: "The Ice Age Adventures of Buck Wild",
-			text: "Рейтинг этого фильма больше чем 6?",
-			correctAnswer: false),
-		QuizQuestion(
-			image: "Tesla",
-			text: "Рейтинг этого фильма больше чем 6?",
-			correctAnswer: false),
-		QuizQuestion(
-			image: "Vivarium",
-			text: "Рейтинг этого фильма больше чем 6?",
-			correctAnswer: false)
-	]
-	
+	private let questionsAmount: Int = 10
+	private var questionFactory: QuestionFactory = QuestionFactory()
+	private var currentQuestion: QuizQuestion? {
+		didSet {
+			guard let currentQuestion else { return }
+			let viewModel = convert(model: currentQuestion)
+			show(quiz: viewModel)
+		}
+	}
 	
 	// MARK: - Lifecycle
     override func viewDidLoad() {
@@ -83,7 +48,7 @@ final class MovieQuizViewController: UIViewController {
 	
 	// MARK: - IBActions
 	@IBAction private func anyButtonTouchUp(_ sender: UIButton) {
-		let currentQuestion = questions[currentQuestionIndex]
+		guard let currentQuestion else { return }
 		let givenAnswer = sender.accessibilityIdentifier == "yesButton"
 		let isCorrect = givenAnswer == currentQuestion.correctAnswer
 		if isCorrect {
@@ -99,7 +64,7 @@ final class MovieQuizViewController: UIViewController {
 	
 	// MARK: - Private Methods
 	private func showNextQuestionOrResults(nextQuestionIndex: Int) {
-		if nextQuestionIndex == questions.count {
+		if currentQuestionIndex == questionsAmount {
 			// идём в состояние "Результат квиза"
 			let text = "Ваш результат: \(correctAnswers)/10"
 			let viewModel = QuizResultsViewModel(
@@ -107,17 +72,15 @@ final class MovieQuizViewController: UIViewController {
 				text: text,
 				buttonText: "Сыграть ещё раз")
 			show(quiz: viewModel)
-		} else {
-			let nextQuestion = questions[nextQuestionIndex]
-			let viewModel = convert(model: nextQuestion)
-			show(quiz: viewModel)
+		} else if let currentQuestion = questionFactory.requestNextQuestion() {
+			self.currentQuestion = currentQuestion
 		}
 	}
 	private func convert(model: QuizQuestion) -> QuizStepViewModel {
 		let questionStep = QuizStepViewModel(
 			image: UIImage(named: model.image) ?? UIImage(),
 			question: model.text,
-			questionNumber: "\(currentQuestionIndex + 1)/\(questions.count)")
+			questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)")
 		return questionStep
 	}
 	private func show(quiz step: QuizStepViewModel) {
@@ -140,31 +103,4 @@ final class MovieQuizViewController: UIViewController {
 		
 		self.present(alert, animated: true, completion: nil)
 	}
-}
-
-struct QuizQuestion {
-	// строка с названием фильма,
-	// совпадает с названием картинки афиши фильма в Assets
-	let image: String
-	// строка с вопросом о рейтинге фильма
-	let text: String
-	// булевое значение (true, false), правильный ответ на вопрос
-	let correctAnswer: Bool
-}
-// вью модель для состояния "Вопрос показан"
-struct QuizStepViewModel {
-	// картинка с афишей фильма с типом UIImage
-	let image: UIImage
-	// вопрос о рейтинге квиза
-	let question: String
-	// строка с порядковым номером этого вопроса (ex. "1/10")
-	let questionNumber: String
-}
-struct QuizResultsViewModel {
-	// строка с заголовком алерта
-	let title: String
-	// строка с текстом о количестве набранных очков
-	let text: String
-	// текст для кнопки алерта
-	let buttonText: String
 }
