@@ -1,6 +1,6 @@
 import UIKit
 
-final class MovieQuizViewController: UIViewController {
+final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
 	// MARK: - IB Outlets
 	@IBOutlet weak private var imageView: UIImageView!
 	@IBOutlet weak private var textLabel: UILabel!
@@ -8,6 +8,7 @@ final class MovieQuizViewController: UIViewController {
 	@IBOutlet weak private var noButton: UIButton!
 	@IBOutlet weak private var yesButton: UIButton!
 	// MARK: - Properties
+	
 	private var imageBorderColor: UIColor = .clear {
 		didSet {
 			imageView.layer.borderColor = imageBorderColor.cgColor
@@ -31,20 +32,37 @@ final class MovieQuizViewController: UIViewController {
 	// переменная со счётчиком правильных ответов
 	private var correctAnswers = 0
 	private let questionsAmount: Int = 10
-	private var questionFactory: QuestionFactory = QuestionFactory()
+	private lazy var alertPresenter: AlertPresenterProtocol = AlertPresenter(controller: self)
+	private lazy var questionFactory: QuestionFactoryProtocol = {
+		let factory = QuestionFactory()
+		factory.delegate = self
+		return factory
+	}()
+	private lazy var statisticService: StatisticServiceProtocol = StatisticService()
 	private var currentQuestion: QuizQuestion? {
 		didSet {
 			guard let currentQuestion else { return }
 			let viewModel = convert(model: currentQuestion)
-			show(quiz: viewModel)
+			show(next: viewModel)
 		}
 	}
 	
 	// MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
+		questionFactory = {
+			let questionFactory = QuestionFactory()
+			questionFactory.delegate = self
+			return questionFactory
+		}()
+		alertPresenter = AlertPresenter(controller: self)
+		
 		showNextQuestionOrResults(nextQuestionIndex: currentQuestionIndex)
     }
+	// MARK: - QuestionFactoryDelegate
+	func didReceiveNextQuestion(question: QuizQuestion?) {
+		currentQuestion = question
+	}
 	
 	// MARK: - IBActions
 	@IBAction private func anyButtonTouchUp(_ sender: UIButton) {
@@ -66,14 +84,20 @@ final class MovieQuizViewController: UIViewController {
 	private func showNextQuestionOrResults(nextQuestionIndex: Int) {
 		if currentQuestionIndex == questionsAmount {
 			// идём в состояние "Результат квиза"
-			let text = "Ваш результат: \(correctAnswers)/10"
+			statisticService.store(correct: correctAnswers, total: questionsAmount)
+			let text = """
+				Ваш результат: \(correctAnswers)/\(questionsAmount)
+				Колличество сыгранных квизов: \(statisticService.gamesCount)
+				Рекорд: \(statisticService.bestGame?.description ?? "-")
+				Средняя точность: \(String(format: "%.2f", statisticService.totalAccuracy))%
+				"""
 			let viewModel = QuizResultsViewModel(
 				title: "Этот раунд окончен!",
 				text: text,
 				buttonText: "Сыграть ещё раз")
-			show(quiz: viewModel)
-		} else if let currentQuestion = questionFactory.requestNextQuestion() {
-			self.currentQuestion = currentQuestion
+			show(result: viewModel)
+		} else {
+			questionFactory.requestNextQuestion()
 		}
 	}
 	private func convert(model: QuizQuestion) -> QuizStepViewModel {
@@ -83,24 +107,20 @@ final class MovieQuizViewController: UIViewController {
 			questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)")
 		return questionStep
 	}
-	private func show(quiz step: QuizStepViewModel) {
-		imageView.image = step.image
-		textLabel.text = step.question
-		counterLabel.text = step.questionNumber
-	}
-	private func show(quiz result: QuizResultsViewModel) {
-		let alert = UIAlertController(
-			title: result.title,
-			message: result.text,
-			preferredStyle: .alert)
-		
-		let action = UIAlertAction(title: result.buttonText, style: .default) { [weak self] _ in
-			self?.currentQuestionIndex = 0
-			self?.correctAnswers = 0
+	private func show(next step: QuizStepViewModel) {
+		DispatchQueue.main.async { [weak self] in
+			guard let self else { return }
+			self.imageView.image = step.image
+			self.textLabel.text = step.question
+			self.counterLabel.text = step.questionNumber
 		}
-		
-		alert.addAction(action)
-		
-		self.present(alert, animated: true, completion: nil)
+	}
+	private func show(result: QuizResultsViewModel) {
+		let model = AlertModel(result) { [weak self] _ in
+			guard let self else { return }
+			self.currentQuestionIndex = 0
+			self.correctAnswers = 0
+		}
+		alertPresenter.present(alert: model)
 	}
 }
