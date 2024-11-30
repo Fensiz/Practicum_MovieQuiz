@@ -9,11 +9,11 @@ import UIKit
 
 class AlertPresenter : AlertPresenterProtocol {
 	private weak var controller: UIViewController?
-	
+
 	init(controller: UIViewController) {
 		self.controller = controller
 	}
-	
+
 	func present(alert: AlertModel) {
 		let alertController = UIAlertController(
 			title: alert.title,

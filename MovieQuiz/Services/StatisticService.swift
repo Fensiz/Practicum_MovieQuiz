@@ -39,7 +39,7 @@ final class StatisticService: StatisticServiceProtocol {
 			storage.set(newValue.date, forKey: .bestDate)
 		}
 	}
-	
+
 	// MARK: - Private Properties
 	private let storage: UserDefaults = .standard
 	private var totalCorrect: Int {

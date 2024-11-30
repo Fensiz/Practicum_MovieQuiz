@@ -11,6 +11,7 @@ struct AlertModel {
 	let message: String
 	let buttonText: String
 	let action: (UIAlertAction) -> Void
+
 	init(_ result: QuizResultsViewModel, _ action: @escaping (UIAlertAction) -> Void) {
 		title = result.title
 		message = result.text

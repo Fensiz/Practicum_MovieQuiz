@@ -7,8 +7,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
 	@IBOutlet weak private var counterLabel: UILabel!
 	@IBOutlet weak private var noButton: UIButton!
 	@IBOutlet weak private var yesButton: UIButton!
+
 	// MARK: - Properties
-	
 	private var imageBorderColor: UIColor = .clear {
 		didSet {
 			imageView.layer.borderColor = imageBorderColor.cgColor
@@ -46,7 +46,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
 			show(next: viewModel)
 		}
 	}
-	
+
 	// MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -63,7 +63,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
 	func didReceiveNextQuestion(question: QuizQuestion?) {
 		currentQuestion = question
 	}
-	
+
 	// MARK: - IBActions
 	@IBAction private func anyButtonTouchUp(_ sender: UIButton) {
 		guard let currentQuestion else { return }
@@ -79,7 +79,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
 		yesButton.isEnabled = false
 		noButton.isEnabled = false
 	}
-	
+
 	// MARK: - Private Methods
 	private func showNextQuestionOrResults(nextQuestionIndex: Int) {
 		if currentQuestionIndex == questionsAmount {

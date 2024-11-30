@@ -52,7 +52,7 @@ class QuestionFactory : QuestionFactoryProtocol {
 			text: "Рейтинг этого фильма больше чем 6?",
 			correctAnswer: false)
 	]
-	
+
 	func requestNextQuestion() {
 		let index = (0..<questions.count).randomElement() ?? 0
 
