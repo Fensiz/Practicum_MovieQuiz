@@ -14,7 +14,7 @@ struct GameResult {
 	var description: String {
 		"\(correct)/\(total) (\(date.dateTimeString))"
 	}
-
+	
 	// метод сравнения по количеству верных ответов
 	func isBetterThan(_ another: GameResult?) -> Bool {
 		guard let another else { return true }

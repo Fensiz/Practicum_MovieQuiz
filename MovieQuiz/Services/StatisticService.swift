@@ -9,13 +9,15 @@ import Foundation
 
 final class StatisticService: StatisticServiceProtocol {
 	// MARK: - Public Properties
+
 	var totalAccuracy: Double {
 		guard gamesCount > 0 else { return 0 }
-		#if DEBUG
+#if DEBUG
 		print("correct: \(totalCorrect) games: \(gamesCount) %:\(Double(totalCorrect) / Double(gamesCount) * 10)")
-		#endif
+#endif
 		return Double(totalCorrect) / Double(gamesCount) * 10
 	}
+
 	private(set) var gamesCount: Int {
 		get {
 			storage.integer(forKey: .gamesCount)
@@ -24,6 +26,7 @@ final class StatisticService: StatisticServiceProtocol {
 			storage.set(newValue, forKey: .gamesCount)
 		}
 	}
+
 	private(set) var bestGame: GameResult? {
 		get {
 			guard gamesCount > 0 else { return nil }
@@ -41,6 +44,7 @@ final class StatisticService: StatisticServiceProtocol {
 	}
 
 	// MARK: - Private Properties
+
 	private let storage: UserDefaults = .standard
 	private var totalCorrect: Int {
 		get {
@@ -52,6 +56,7 @@ final class StatisticService: StatisticServiceProtocol {
 	}
 
 	// MARK: - Public Methods
+
 	func store(correct count: Int, total amount: Int) {
 		let date = Date()
 		let gameResult: GameResult = .init(correct: count, total: amount, date: date)
