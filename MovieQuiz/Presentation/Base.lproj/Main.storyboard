@@ -89,6 +89,7 @@
                                                 <connections>
                                                     <action selector="anyButtonTouchDown:" destination="BYZ-38-t0r" eventType="touchDown" id="fEp-Hc-VOa"/>
                                                     <action selector="anyButtonTouchUp:" destination="BYZ-38-t0r" eventType="touchUpInside" id="34E-Ir-c9Q"/>
+                                                    <action selector="anyButtonTouchUpOutside:" destination="BYZ-38-t0r" eventType="touchUpOutside" id="cr2-RR-2Wm"/>
                                                 </connections>
                                             </button>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="8oB-C8-LmX" userLabel="Yes Button">
@@ -107,6 +108,7 @@
                                                 <connections>
                                                     <action selector="anyButtonTouchDown:" destination="BYZ-38-t0r" eventType="touchDown" id="9fa-gP-7Fv"/>
                                                     <action selector="anyButtonTouchUp:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Lxe-kU-XLf"/>
+                                                    <action selector="anyButtonTouchUpOutside:" destination="BYZ-38-t0r" eventType="touchUpOutside" id="T9w-ds-qkC"/>
                                                 </connections>
                                             </button>
                                         </subviews>
@@ -116,17 +118,23 @@
                                     </stackView>
                                 </subviews>
                             </stackView>
+                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="large" translatesAutoresizingMaskIntoConstraints="NO" id="9B2-Ce-YJg">
+                                <rect key="frame" x="201.66666666666666" y="459.66666666666669" width="37" height="37"/>
+                            </activityIndicatorView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" name="YP Black"/>
                         <constraints>
+                            <constraint firstItem="9B2-Ce-YJg" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="2rL-ep-SR2"/>
                             <constraint firstItem="NYE-5z-xK0" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="20" id="4sg-b0-dIq"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="NYE-5z-xK0" secondAttribute="trailing" constant="20" id="5vU-OD-NPd"/>
+                            <constraint firstItem="9B2-Ce-YJg" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="Dmd-SD-Nwq"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="NYE-5z-xK0" secondAttribute="bottom" id="PrN-5g-70q"/>
                             <constraint firstItem="NYE-5z-xK0" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="10" id="YwX-tq-Ean"/>
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="activityIndicator" destination="9B2-Ce-YJg" id="d1d-zM-wso"/>
                         <outlet property="counterLabel" destination="CC4-xl-uOH" id="a8n-QX-8Fu"/>
                         <outlet property="imageView" destination="a7S-ol-gzL" id="4Uj-xO-BVd"/>
                         <outlet property="noButton" destination="oPy-Kn-w47" id="XAJ-Xr-qak"/>
