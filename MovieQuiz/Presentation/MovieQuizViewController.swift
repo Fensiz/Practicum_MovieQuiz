@@ -59,7 +59,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
 		textLabel.text = ""
 		showLoadingIndicator()
 		questionFactory?.loadData()
-//		showNextQuestionOrResults(nextQuestionIndex: currentQuestionIndex)
 	}
 
 	// MARK: - QuestionFactoryDelegate
@@ -74,7 +73,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
 	}
 
 	func didFailToLoadData(with error: any Error) {
-		show(networkError: error) // возьмём в качестве сообщения описание ошибки
+		show(networkError: error)
 	}
 
 	// MARK: - IBActions
@@ -152,23 +151,25 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
 	}
 
 	private func show(networkError error: any Error) {
-		guard let error = error as? QuestionFactory.LoadError else { return }
 		hideLoadingIndicator()
 
 		let model = AlertModel(
 			title: "Ошибка",
-			message: error.errorDescription,
+			message: error.localizedDescription,
 			buttonText: "Попробовать еще раз"
-		) { [weak questionFactory] _ in
-			guard let questionFactory else { return }
+		) { [weak questionFactory, weak self] _ in
+			guard
+				let questionFactory,
+				let self
+			else { return }
+			self.showLoadingIndicator()
 			switch error {
-				case .apiError, .movieListLoadError:
-					questionFactory.loadData()
-				case .imageLoadError:
+				case QuestionFactory.LoadError.imageLoadError:
 					questionFactory.requestNextQuestion()
+				default:
+					questionFactory.loadData()
 			}
 		}
-		print("before present")
 		alertPresenter.present(alert: model)
 	}
 
