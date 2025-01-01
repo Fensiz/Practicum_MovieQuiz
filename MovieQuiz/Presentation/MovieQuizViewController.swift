@@ -80,7 +80,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
 
 	@IBAction private func anyButtonTouchUp(_ sender: UIButton) {
 		guard let currentQuestion else { return }
-		let givenAnswer = sender.accessibilityIdentifier == "yesButton"
+		let givenAnswer = sender.accessibilityIdentifier == "YesButton"
 		let isCorrect = givenAnswer == currentQuestion.correctAnswer
 		if isCorrect {
 			correctAnswers += 1
