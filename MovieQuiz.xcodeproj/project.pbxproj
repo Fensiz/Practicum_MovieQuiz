@@ -35,6 +35,7 @@
 		F4DCB66B2CFA3E6500DA81F0 /* StatisticService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4DCB66A2CFA3E5F00DA81F0 /* StatisticService.swift */; };
 		F4DCB66D2CFA3EBF00DA81F0 /* GameResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4DCB66C2CFA3EBA00DA81F0 /* GameResult.swift */; };
 		F4DCB6BD2CFB3B9C00DA81F0 /* UserDefaults+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4DCB6BC2CFB3B9200DA81F0 /* UserDefaults+Extensions.swift */; };
+		F4FE25F42D257BF2003456F9 /* MovieQuizPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4FE25F32D257BEB003456F9 /* MovieQuizPresenter.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -95,6 +96,7 @@
 		F4DCB66A2CFA3E5F00DA81F0 /* StatisticService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticService.swift; sourceTree = "<group>"; };
 		F4DCB66C2CFA3EBA00DA81F0 /* GameResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameResult.swift; sourceTree = "<group>"; };
 		F4DCB6BC2CFB3B9200DA81F0 /* UserDefaults+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserDefaults+Extensions.swift"; sourceTree = "<group>"; };
+		F4FE25F32D257BEB003456F9 /* MovieQuizPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieQuizPresenter.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -138,6 +140,7 @@
 		8F4738322848DE2A005DF65E /* Presentation */ = {
 			isa = PBXGroup;
 			children = (
+				F4FE25F32D257BEB003456F9 /* MovieQuizPresenter.swift */,
 				F416583D2CF6402E00C6786C /* AlertPresenterProtocol.swift */,
 				F41658392CF63B7200C6786C /* AlertPresenter.swift */,
 				AD1ABAB52831907B00B3E448 /* MovieQuizViewController.swift */,
@@ -432,6 +435,7 @@
 				AD5EE5DE284D7887003966EF /* UIColor+Extensions.swift in Sources */,
 				F41658262CF3A26A00C6786C /* QuestionFactoryProtocol.swift in Sources */,
 				F4DCB6BD2CFB3B9C00DA81F0 /* UserDefaults+Extensions.swift in Sources */,
+				F4FE25F42D257BF2003456F9 /* MovieQuizPresenter.swift in Sources */,
 				F41658382CF4F44000C6786C /* QuestionFactoryDelegate.swift in Sources */,
 				F4DCB6692CFA3E5B00DA81F0 /* StatisticServiceProtocol.swift in Sources */,
 				F416583E2CF6403500C6786C /* AlertPresenterProtocol.swift in Sources */,
