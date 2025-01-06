@@ -24,6 +24,9 @@ final class AlertPresenter : AlertPresenterProtocol {
 
 		alertController.addAction(action)
 
-		controller?.present(alertController, animated: true, completion: nil)
+		DispatchQueue.main.async { [weak controller] in
+			guard let controller else { return }
+			controller.present(alertController, animated: true, completion: nil)
+		}
 	}
 }

@@ -8,13 +8,15 @@
 import Foundation
 
 final class StatisticService: StatisticServiceProtocol {
+
 	// MARK: - Public Properties
 
 	var totalAccuracy: Double {
 		guard gamesCount > 0 else { return 0 }
-#if DEBUG
-		print("correct: \(totalCorrect) games: \(gamesCount) %:\(Double(totalCorrect) / Double(gamesCount) * 10)")
-#endif
+		Utils.debugPrint(
+			"correct: \(totalCorrect)",
+			"games: \(gamesCount) %:\(Double(totalCorrect) / Double(gamesCount) * 10)"
+		)
 		return Double(totalCorrect) / Double(gamesCount) * 10
 	}
 

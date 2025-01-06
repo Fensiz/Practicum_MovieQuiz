@@ -1,6 +1,7 @@
 import UIKit
 
 final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
+
 	// MARK: - IB Outlets
 
 	@IBOutlet weak private var imageView: UIImageView!
@@ -8,6 +9,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
 	@IBOutlet weak private var counterLabel: UILabel!
 	@IBOutlet weak private var noButton: UIButton!
 	@IBOutlet weak private var yesButton: UIButton!
+	@IBOutlet weak private var activityIndicator: UIActivityIndicatorView!
 
 	// MARK: - Properties
 
@@ -33,8 +35,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
 			let delay = currentQuestionIndex == 0 ? 0 : 1.0
 
 			DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self, currentQuestionIndex] in
-				self?.yesButton.isEnabled = true
-				self?.noButton.isEnabled = true
 				self?.showNextQuestionOrResults(nextQuestionIndex: currentQuestionIndex)
 			}
 		}
@@ -44,9 +44,11 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
 	private let questionsAmount: Int = 10
 	private lazy var statisticService: StatisticServiceProtocol = StatisticService()
 	private lazy var alertPresenter: AlertPresenterProtocol = AlertPresenter(controller: self)
-	private lazy var questionFactory: QuestionFactoryProtocol = {
-		let factory = QuestionFactory()
-		factory.delegate = self
+	private lazy var questionFactory: QuestionFactoryProtocol? = {
+		let factory = QuestionFactory(
+			moviesLoader: MoviesLoader(),
+			delegate: self
+		)
 		return factory
 	}()
 
@@ -54,13 +56,24 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
 
 	override func viewDidLoad() {
 		super.viewDidLoad()
-		showNextQuestionOrResults(nextQuestionIndex: currentQuestionIndex)
+		textLabel.text = ""
+		showLoadingIndicator()
+		questionFactory?.loadData()
 	}
 
 	// MARK: - QuestionFactoryDelegate
 
 	func didReceiveNextQuestion(question: QuizQuestion?) {
+		hideLoadingIndicator()
 		currentQuestion = question
+	}
+
+	func didLoadDataFromServer() {
+		questionFactory?.requestNextQuestion()
+	}
+
+	func didFailToLoadData(with error: any Error) {
+		show(networkError: error)
 	}
 
 	// MARK: - IBActions
@@ -81,6 +94,11 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
 		noButton.isEnabled = false
 	}
 
+	@IBAction func anyButtonTouchUpOutside(_ sender: UIButton) {
+		yesButton.isEnabled = true
+		noButton.isEnabled = true
+	}
+
 	// MARK: - Private Methods
 
 	private func showNextQuestionOrResults(nextQuestionIndex: Int) {
@@ -99,13 +117,14 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
 				buttonText: "Сыграть ещё раз")
 			show(result: viewModel)
 		} else {
-			questionFactory.requestNextQuestion()
+			showLoadingIndicator()
+			questionFactory?.requestNextQuestion()
 		}
 	}
 
 	private func convert(model: QuizQuestion) -> QuizStepViewModel {
 		let questionStep = QuizStepViewModel(
-			image: UIImage(named: model.image) ?? UIImage(),
+			image: UIImage(data: model.image) ?? UIImage(),
 			question: model.text,
 			questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)")
 		return questionStep
@@ -117,6 +136,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
 			self.imageView.image = step.image
 			self.textLabel.text = step.question
 			self.counterLabel.text = step.questionNumber
+			self.yesButton.isEnabled = true
+			self.noButton.isEnabled = true
 		}
 	}
 
@@ -127,5 +148,44 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
 			self.correctAnswers = 0
 		}
 		alertPresenter.present(alert: model)
+	}
+
+	private func show(networkError error: any Error) {
+		hideLoadingIndicator()
+
+		let model = AlertModel(
+			title: "Ошибка",
+			message: error.localizedDescription,
+			buttonText: "Попробовать еще раз"
+		) { [weak questionFactory, weak self] _ in
+			guard
+				let questionFactory,
+				let self
+			else { return }
+			self.showLoadingIndicator()
+			switch error {
+				case QuestionFactory.LoadError.imageLoadError:
+					questionFactory.requestNextQuestion()
+				default:
+					questionFactory.loadData()
+			}
+		}
+		alertPresenter.present(alert: model)
+	}
+
+	private func showLoadingIndicator() {
+		DispatchQueue.main.async { [weak self] in
+			guard let self else { return }
+			self.activityIndicator.isHidden = false
+			self.activityIndicator.startAnimating()
+		}
+	}
+
+	private func hideLoadingIndicator() {
+		DispatchQueue.main.async { [weak self] in
+			guard let self else { return }
+			activityIndicator.stopAnimating()
+			activityIndicator.isHidden = true
+		}
 	}
 }
