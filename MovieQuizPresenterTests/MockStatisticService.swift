@@ -9,7 +9,6 @@ import XCTest
 @testable import MovieQuiz
 
 final class MockStatisticService: StatisticServiceProtocol {
-	
 	var gamesCount = 0
 	var totalAccuracy: Double = 0
 	var bestGame: GameResult?

@@ -10,14 +10,14 @@ import XCTest
 final class MovieQuizTests: XCTestCase {
 	var app: XCUIApplication!
 
-    override func setUpWithError() throws {
-        continueAfterFailure = false
+	override func setUpWithError() throws {
+		continueAfterFailure = false
 
 		app = XCUIApplication()
 		app.launch()
-    }
+	}
 
-    override func tearDownWithError() throws {
+	override func tearDownWithError() throws {
 		/*
 		 опираясь на решение по багу https://forums.developer.apple.com/forums/thread/113314
 		 и документацию Apple https://developer.apple.com/documentation/xctest/xctestcase/set_up_and_tear_down_state_in_your_tests
@@ -26,7 +26,7 @@ final class MovieQuizTests: XCTestCase {
 
 		app.terminate()
 		app = nil
-    }
+	}
 
 	@MainActor
 	func testImageSwitchWithYesButton() throws {

@@ -69,5 +69,4 @@ final class MovieQuizPresenterTests: XCTestCase {
 		XCTAssertTrue(mockViewController.isShowResultCalled)
 		XCTAssertEqual(mockViewController.lastResultViewModel?.title, "Этот раунд окончен!")
 	}
-
 }
