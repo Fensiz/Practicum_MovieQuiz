@@ -11,7 +11,6 @@ final class MovieQuizTests: XCTestCase {
 	var app: XCUIApplication!
 
     override func setUpWithError() throws {
-		try super.setUpWithError()
         continueAfterFailure = false
 
 		app = XCUIApplication()
@@ -19,8 +18,11 @@ final class MovieQuizTests: XCTestCase {
     }
 
     override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-		try super.tearDownWithError()
+		/*
+		 опираясь на решение по багу https://forums.developer.apple.com/forums/thread/113314
+		 и документацию Apple https://developer.apple.com/documentation/xctest/xctestcase/set_up_and_tear_down_state_in_your_tests
+		 я убираю из методов `try super.tearDownWithError()`
+		 */
 
 		app.terminate()
 		app = nil
@@ -101,16 +103,4 @@ final class MovieQuizTests: XCTestCase {
 		sleep(2)
 		XCTAssertEqual(app.staticTexts["Index"].label, "2/10")
 	}
-
-    @MainActor
-    func testLaunchPerformance() throws {
-        if #available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 7.0, *) {
-            // This measures how long it takes to launch your application.
-            measure(metrics: [XCTApplicationLaunchMetric()]) {
-                XCUIApplication().launch()
-            }
-        }
-    }
-	
-
 }

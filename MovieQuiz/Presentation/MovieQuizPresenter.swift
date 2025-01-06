@@ -8,15 +8,24 @@ import UIKit
 
 final class MovieQuizPresenter {
 	private var questionFactory: QuestionFactoryProtocol?
-	private weak var viewController: MovieQuizViewController?
+	private weak var viewController: MovieQuizViewProtocol?
 	private var correctAnswers = 0
 	private let questionsAmount = 10
-	private lazy var statisticService: StatisticServiceProtocol = StatisticService()
+	private var statisticService: StatisticServiceProtocol?
 
-	init(viewController: MovieQuizViewController? = nil) {
-		self.questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
+	init(
+		viewController: MovieQuizViewProtocol? = nil,
+		questionFactory: QuestionFactoryProtocol? = nil,
+		statisticService: StatisticServiceProtocol = StatisticService()
+	) {
+		if questionFactory != nil {
+			self.questionFactory = questionFactory
+		} else {
+			self.questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
+		}
 		self.viewController = viewController
-		questionFactory?.loadData()
+		self.statisticService = statisticService
+		self.questionFactory?.loadData()
 	}
 
 
@@ -38,7 +47,9 @@ final class MovieQuizPresenter {
 		}
 	}
 
-	func handleError(_ error: any Error) {
+	// MARK: - Public Methods
+
+	func handleErrorAndRetry(_ error: any Error) {
 		switch error {
 			case QuestionFactory.LoadError.imageLoadError:
 				questionFactory?.requestNextQuestion()
@@ -61,15 +72,25 @@ final class MovieQuizPresenter {
 		currentQuestionIndex += 1
 	}
 
+	func convert(model: QuizQuestion) -> QuizStepViewModel {
+		let questionStep = QuizStepViewModel(
+			image: UIImage(data: model.image) ?? UIImage(),
+			question: model.text,
+			questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)")
+		return questionStep
+	}
+
+	// MARK: - Private Methods
+
 	private func showNextQuestionOrResults(nextQuestionIndex: Int) {
 		if currentQuestionIndex == questionsAmount {
 			// идём в состояние "Результат квиза"
-			statisticService.store(correct: correctAnswers, total: questionsAmount)
+			statisticService?.store(correct: correctAnswers, total: questionsAmount)
 			let text = """
    Ваш результат: \(correctAnswers)/\(questionsAmount)
-   Колличество сыгранных квизов: \(statisticService.gamesCount)
-   Рекорд: \(statisticService.bestGame?.description ?? "-")
-   Средняя точность: \(String(format: "%.2f", statisticService.totalAccuracy))%
+   Колличество сыгранных квизов: \(statisticService?.gamesCount.description ?? "-")
+   Рекорд: \(statisticService?.bestGame?.description ?? "-")
+   Средняя точность: \(String(format: "%.2f", statisticService?.totalAccuracy ?? "0"))%
    """
 			let viewModel = QuizResultsViewModel(
 				title: "Этот раунд окончен!",
@@ -80,13 +101,6 @@ final class MovieQuizPresenter {
 			viewController?.showLoadingIndicator()
 			questionFactory?.requestNextQuestion()
 		}
-	}
-	private func convert(model: QuizQuestion) -> QuizStepViewModel {
-		let questionStep = QuizStepViewModel(
-			image: UIImage(data: model.image) ?? UIImage(),
-			question: model.text,
-			questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)")
-		return questionStep
 	}
 }
 
