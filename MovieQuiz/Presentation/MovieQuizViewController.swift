@@ -1,6 +1,6 @@
 import UIKit
 
-final class MovieQuizViewController: UIViewController {//}, QuestionFactoryDelegate {
+final class MovieQuizViewController: UIViewController {
 
 	// MARK: - IB Outlets
 
