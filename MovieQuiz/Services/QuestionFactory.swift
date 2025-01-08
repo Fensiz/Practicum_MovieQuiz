@@ -14,8 +14,12 @@ final class QuestionFactory: QuestionFactoryProtocol {
 	private var min = 0
 	private var max = 0
 
-	init(moviesLoader: MoviesLoading, delegate: QuestionFactoryDelegate?) {
+	init(moviesLoader: MoviesLoading, delegate: QuestionFactoryDelegate? = nil) {
 		self.moviesLoader = moviesLoader
+		self.delegate = delegate
+	}
+
+	func setDelegate(_ delegate: QuestionFactoryDelegate?) {
 		self.delegate = delegate
 	}
 

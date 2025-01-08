@@ -7,27 +7,31 @@
 import UIKit
 
 final class MovieQuizPresenter {
-	private var questionFactory: QuestionFactoryProtocol?
+	private let questionFactory: QuestionFactoryProtocol
 	private weak var viewController: MovieQuizViewProtocol?
 	private var correctAnswers = 0
 	private let questionsAmount = 10
-	private var statisticService: StatisticServiceProtocol?
+	private let statisticService: StatisticServiceProtocol
 
 	init(
 		viewController: MovieQuizViewProtocol? = nil,
-		questionFactory: QuestionFactoryProtocol? = nil,
+		questionFactory: QuestionFactoryProtocol,
 		statisticService: StatisticServiceProtocol = StatisticService()
 	) {
-		if questionFactory != nil {
-			self.questionFactory = questionFactory
-		} else {
-			self.questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
-		}
+		self.questionFactory = questionFactory
 		self.viewController = viewController
 		self.statisticService = statisticService
-		self.questionFactory?.loadData()
+		self.questionFactory.loadData()
 	}
 
+	convenience init(viewController: MovieQuizViewProtocol? = nil) {
+		let factory = QuestionFactory(moviesLoader: MoviesLoader())
+		self.init(
+			viewController: viewController,
+			questionFactory: factory
+		)
+		factory.setDelegate(self)
+	}
 
 	private var currentQuestion: QuizQuestion? {
 		didSet {
@@ -52,9 +56,9 @@ final class MovieQuizPresenter {
 	func handleErrorAndRetry(_ error: any Error) {
 		switch error {
 			case QuestionFactory.LoadError.imageLoadError:
-				questionFactory?.requestNextQuestion()
+				questionFactory.requestNextQuestion()
 			default:
-				questionFactory?.loadData()
+				questionFactory.loadData()
 		}
 	}
 
@@ -85,12 +89,12 @@ final class MovieQuizPresenter {
 	private func showNextQuestionOrResults(nextQuestionIndex: Int) {
 		if currentQuestionIndex == questionsAmount {
 			// идём в состояние "Результат квиза"
-			statisticService?.store(correct: correctAnswers, total: questionsAmount)
+			statisticService.store(correct: correctAnswers, total: questionsAmount)
 			let text = """
    Ваш результат: \(correctAnswers)/\(questionsAmount)
-   Колличество сыгранных квизов: \(statisticService?.gamesCount.description ?? "-")
-   Рекорд: \(statisticService?.bestGame?.description ?? "-")
-   Средняя точность: \(String(format: "%.2f", statisticService?.totalAccuracy ?? "0"))%
+   Колличество сыгранных квизов: \(statisticService.gamesCount.description)
+   Рекорд: \(statisticService.bestGame?.description ?? "-")
+   Средняя точность: \(String(format: "%.2f", statisticService.totalAccuracy))%
    """
 			let viewModel = QuizResultsViewModel(
 				title: "Этот раунд окончен!",
@@ -99,7 +103,7 @@ final class MovieQuizPresenter {
 			viewController?.show(result: viewModel)
 		} else {
 			viewController?.showLoadingIndicator()
-			questionFactory?.requestNextQuestion()
+			questionFactory.requestNextQuestion()
 		}
 	}
 }
@@ -113,7 +117,7 @@ extension MovieQuizPresenter: QuestionFactoryDelegate {
 	}
 
 	func didLoadDataFromServer() {
-		questionFactory?.requestNextQuestion()
+		questionFactory.requestNextQuestion()
 	}
 
 	func didFailToLoadData(with error: any Error) {
